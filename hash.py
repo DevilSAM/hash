@@ -2,11 +2,11 @@
 from random import randint
 
 # массив, в который будем записывать значения
-arr = ['x' for i in range(50)]
+arr = ['x' for i in range(10)]
 
 # наша хеш-функция
 def myHash(num):
-    return num % 37
+    return num % 7
 
 # функция вставки элемента в наш массив
 def insert_to_arr(num):
@@ -46,12 +46,16 @@ def delete_from_arr(num):
             if idx < len(arr) -1:
                 # если следующий эл-т не пустой, то ставим наш маркер ('o'), для сохранения цепочки
                 arr[idx] = 'x' if arr[idx+1] == 'x' else 'o'
+                print('Элемент найден. Удаляем!')
+                return
             else:
                 # это случай для проверки последнего элемента в массиве. Тут нужно смотреть на первый элемент
                 arr[idx] = 'x' if arr[0] == 'x' else 'o'
-        # теперь ветка если мы попали на маркер ('o')
+                print('Элемент ПРЕДПОСЛЕДНИЙ. Удаляем!')
+                return
+        # теперь ветка если мы попали на другое число или маркер ('o')
         else:
-            # идем вправо по цепочки до тех пор, пка не найдем этот элемент или пустую ячейку
+            # идем вправо по цепочки до тех пор, пока не найдем этот элемент или пустую ячейку
             for i in range(idx +1, len(arr)-1):
                 if arr[i] == 'x':
                     print('Отсюда и вправо НЕТ ЭЛЕМЕНТА')
@@ -85,8 +89,8 @@ def delete_from_arr(num):
 
 
 # тестируем на рандмных числах
-for i in range(30):
-    x = randint(0, 100)
+for i in range(7):
+    x = randint(0, 20)
     print('x = {}, hash(x) = {}'.format(x, myHash(x)))
     insert_to_arr(x)
 
@@ -94,8 +98,8 @@ for i in range(30):
 print(arr)
 
 # тестируем на рандмных числах
-for i in range(30):
-    x = randint(0, 100)
+for i in range(7):
+    x = randint(0, 20)
     print('el = {}  (idx={})'.format(x, myHash(x)))
     delete_from_arr(x)
 
