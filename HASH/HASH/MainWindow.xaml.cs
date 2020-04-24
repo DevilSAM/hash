@@ -24,109 +24,112 @@ namespace HASH
         string[] arr = new string[10];
         Dictionary<int, TextBlock> myDict = new Dictionary<int, TextBlock>();
         Dictionary<int, TextBlock> myPointer = new Dictionary<int, TextBlock>();
-
+        bool dictExist = false;
+        int newNum;
+        int newIdx;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        //async Task movePointer(int j)
-        //{
-        //    // Каждый раз надо стирать указатель 
-        //    for (int i = 0; i < 10; i++)
-        //    {
-        //        myPointer[i].Text = "";
-        //    }
-        //    // передвигаем указатель
-        //    myPointer[j].Text = "^";
-        //    await Task.Delay(3000);
-        //    return;
-        //}
-
-        void InsertToArray(int num)
+        private void button1_Click(object sender, RoutedEventArgs e)
         {
-            int idx = num % 7; // наша функция - это остаток от деления на 7
-            insertElement.Text = num.ToString();
-            insertHash.Text = idx.ToString();
-            // Каждый раз надо стирать указатель 
-            for (int i = 0; i < 10; i++) {
-                myPointer[i].Text = "";
-            }
-            // А тут сам алгоритм вставки 
-            if (arr[idx] == "x")
+
+        }
+
+
+        async Task goRight(int idx, int num)
+        {
+            for (int j = idx; j < myDict.Count; j++)
             {
-                arr[idx] = num.ToString();
-                myDict[idx].Text = num.ToString();
-                myPointer[idx].Text = "^";
+                // стираем указатели
+                for (int i = 0; i < myPointer.Count; i++)
+                    myPointer[i].Text = "";
+                // двигаем указатель вправо от хеша и до конца массива
+                myPointer[j].Text = "^";
+                // проверяем пустая ли там ячейка и если да, то вписываем значение
+                if (myDict[j].Text == "x")
+                {
+                    myDict[j].Text = num.ToString();
+                    return;
+                }
+                await Task.Delay(1000);
+            }
+            // если дошли до конца массива и не нашли свободной ячейки, то просматриваем массив с начала
+            for (int j = 0; j < idx; j++)
+            {
+                // стираем указатели
+                for (int i = 0; i < myPointer.Count; i++)
+                    myPointer[i].Text = "";
+                // двигаем указатель вправо от начала до хеша
+                myPointer[j].Text = "^";
+                // проверяем пустая ли там ячейка и если да, то вписываем значение
+                if (myDict[j].Text == "x")
+                {
+                    myDict[j].Text = num.ToString();
+                    return;
+                }
+                await Task.Delay(1000);
+            }
+            // если мы сюда попали, то значит у нас массив заполнен!
+            myDict.Clear();
+            dictExist = false;
+            return;
+        }
+
+        async private void button3_Click(object sender, RoutedEventArgs e)
+        {
+            // Если словарь еще не создан, то создаем его
+            if (!dictExist)
+            {
+                myDict.Clear();
+                myDict.Add(0, b0);
+                myDict.Add(1, b1);
+                myDict.Add(2, b2);
+                myDict.Add(3, b3);
+                myDict.Add(4, b4);
+                myDict.Add(5, b5);
+                myDict.Add(6, b6);
+                myDict.Add(7, b7);
+                myDict.Add(8, b8);
+                myDict.Add(9, b9);
+                myPointer.Clear();
+                myPointer.Add(0, p0);
+                myPointer.Add(1, p1);
+                myPointer.Add(2, p2);
+                myPointer.Add(3, p3);
+                myPointer.Add(4, p4);
+                myPointer.Add(5, p5);
+                myPointer.Add(6, p6);
+                myPointer.Add(7, p7);
+                myPointer.Add(8, p8);
+                myPointer.Add(9, p9);
+                for (int i = 0; i < 10; i++)
+                    myDict[i].Text = "x";
+                dictExist = true;
+            }
+
+            // начинаем работу
+            var rand = new Random();
+            newNum = rand.Next(50);
+            newIdx = newNum % 7;   // это наша хеш-функция
+            // прописываем наше число и хеш в окошки
+            insertElement.Text = newNum.ToString();
+            insertHash.Text = newIdx.ToString();
+            // очищаем каждый раз указатель
+            for (int i = 0; i < 10; i++)
+                myPointer[i].Text = "";
+            if (myDict[newIdx].Text == "x")
+            {
+                myDict[newIdx].Text = newNum.ToString();
+                myPointer[newIdx].Text = "^";
             }
             else
             {
-                for (int j = idx; j < arr.Length; j++)
-                {
-                    //await movePointer(j);
-
-                    if (arr[j] == "x")
-                    {
-                        arr[j] = num.ToString();
-                        myDict[j].Text = num.ToString();
-                        myPointer[idx].Text = "^";
-                        myPointer[j].Text = "^";
-                        return;
-                    }
-                }
-                for (int j = 0; j < idx; j++)
-                {
-                    if (arr[j] == "x")
-                    {
-                        arr[j] = num.ToString();
-                        myDict[j].Text = num.ToString();
-                        myPointer[idx].Text = "^";
-                        myPointer[j].Text = "^";
-                        return;
-                    }
-                }
-            } 
-        }
-
-        async private void button1_Click(object sender, RoutedEventArgs e)
-        {
-            myDict.Clear();
-            myDict.Add(0, b0);
-            myDict.Add(1, b1);
-            myDict.Add(2, b2);
-            myDict.Add(3, b3);
-            myDict.Add(4, b4);
-            myDict.Add(5, b5);
-            myDict.Add(6, b6);
-            myDict.Add(7, b7);
-            myDict.Add(8, b8);
-            myDict.Add(9, b9);
-            myPointer.Clear();
-            myPointer.Add(0, p0);
-            myPointer.Add(1, p1);
-            myPointer.Add(2, p2);
-            myPointer.Add(3, p3);
-            myPointer.Add(4, p4);
-            myPointer.Add(5, p5);
-            myPointer.Add(6, p6);
-            myPointer.Add(7, p7);
-            myPointer.Add(8, p8);
-            myPointer.Add(9, p9);
-
-            for (int i = 0; i < 10; i++)
-            {
-                arr[i] = "x";
-                myDict[i].Text = "x";
+                // идем вправо и ищем свободное место
+                await goRight(newIdx, newNum);
             }
-
-            var rand = new Random();
-
-            for (int i = 0; i < 9; i++) 
-            {
-                InsertToArray(rand.Next(50));
-                await Task.Delay(3000);
-            }  
         }
     }
 }

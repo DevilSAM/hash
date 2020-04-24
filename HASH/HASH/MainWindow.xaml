@@ -48,6 +48,7 @@
         </StackPanel>
         <StackPanel Grid.Row="3" Margin="5" Orientation="Horizontal" HorizontalAlignment="Center" >
             <Button x:Name="button1" Content="Показать вставку" Margin="5 5 200 5" Padding="5" Height="30" IsDefault="True" Click="button1_Click" />
+            <Button x:Name="button3" Content="STEP" Margin="5 5 100 5" Padding="5" Height="30" Click="button3_Click" />
             <Button x:Name="button2" Content="Удалить элемент: " Margin="5" Height="30" />
             <TextBox x:Name="textBox1" Width="200" Height="30" />
         </StackPanel>

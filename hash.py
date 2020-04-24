@@ -1,5 +1,6 @@
 # visualization of hash
 from random import randint
+from time import sleep
 
 # массив, в который будем записывать значения
 arr = ['x' for i in range(10)]
