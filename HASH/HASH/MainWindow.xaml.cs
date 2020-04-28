@@ -33,23 +33,23 @@ namespace HASH
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        void movePointer(int idx)
         {
-
+            // стираем указатели
+            for (int j = 0; j < myPointer.Count; j++)
+                myPointer[j].Text = "";
+            // двигаем указатель вправо от хеша и до конца массива
+            myPointer[idx].Text = "^";
         }
-
 
         async Task goRight(int idx, int num)
         {
             for (int j = idx; j < myDict.Count; j++)
             {
-                // стираем указатели
-                for (int i = 0; i < myPointer.Count; i++)
-                    myPointer[i].Text = "";
-                // двигаем указатель вправо от хеша и до конца массива
-                myPointer[j].Text = "^";
+                movePointer(j);
+
                 // проверяем пустая ли там ячейка и если да, то вписываем значение
-                if (myDict[j].Text == "x")
+                if ( (myDict[j].Text == "x") || (myDict[j].Text == "o") )
                 {
                     myDict[j].Text = num.ToString();
                     return;
@@ -59,13 +59,10 @@ namespace HASH
             // если дошли до конца массива и не нашли свободной ячейки, то просматриваем массив с начала
             for (int j = 0; j < idx; j++)
             {
-                // стираем указатели
-                for (int i = 0; i < myPointer.Count; i++)
-                    myPointer[i].Text = "";
-                // двигаем указатель вправо от начала до хеша
-                myPointer[j].Text = "^";
+                movePointer(j);
+
                 // проверяем пустая ли там ячейка и если да, то вписываем значение
-                if (myDict[j].Text == "x")
+                if ( (myDict[j].Text == "x") || (myDict[j].Text == "o") )
                 {
                     myDict[j].Text = num.ToString();
                     return;
@@ -78,8 +75,91 @@ namespace HASH
             return;
         }
 
-        async private void button3_Click(object sender, RoutedEventArgs e)
+        async Task delRight(string delEl, int delIdx)
         {
+            // идем вправо по кластеру и ищем удаляемый элемент
+            for (int i = delIdx; i < 9; i++)
+            {
+                movePointer(i);
+
+                if (myDict[i].Text == "x")
+                {
+                    outputWindow.Text = "Элемент не найден.";
+                    return;
+                } else if (myDict[i].Text == delEl)
+                {
+                    if (myDict[i +1].Text == "x")
+                    {
+                        myDict[i].Text = "x";
+                        outputWindow.Text = "Элемент удален. Конец кластера!";
+                    } else
+                    {
+                        myDict[i].Text = "o";
+                        outputWindow.Text = "Элемент удален. Ставим маркер!";
+                    }
+                    return;
+                }
+
+                await Task.Delay(1000);
+            }
+            // если ни один return до этого не сработал, то проверим последний эл-т
+            movePointer(9);
+
+            if (myDict[9].Text == "x")
+            {
+                outputWindow.Text = "Last element is not the one too";
+                return;
+            } else if (myDict[9].Text == delEl)
+            {
+                outputWindow.Text = "Element was founded at the last index";
+                if (myDict[0].Text == "x")
+                {
+                    myDict[9].Text = "x";
+                } else
+                {
+                    myDict[9].Text = "o";
+                }
+                return;
+            }
+            // задержимся на последнем элементе для показухи
+            await Task.Delay(1000);
+            // проверили все элементы справа. Теперь надо проверить слева.
+            for (int i = 0; i < delIdx; i++)
+            {
+                movePointer(i);
+
+                if (myDict[i].Text == "x")
+                {
+                    outputWindow.Text = "There is no element you find";
+                    return;
+                }
+                else if (myDict[i].Text == delEl) {
+                    if (myDict[i+1].Text == "x")
+                    {
+                        outputWindow.Text = "Нашел и удалил!";
+                        myDict[i].Text = "x";
+                        return;
+                    }
+                    else
+                    {
+                        outputWindow.Text = "Удаляем и ставим маркер!";
+                        myDict[i].Text = "o";
+                        return;
+                    }
+                }
+
+                await Task.Delay(1000);
+            }
+
+            // все проверили. Если дошли сюда, то такого элемента нет.
+            outputWindow.Text = "Такого элемента не обнаружено";
+            return;
+        }
+
+        async private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            // отключим кнопку, чтобы на нее не тыкали часто
+            button1.IsEnabled = false;
             // Если словарь еще не создан, то создаем его
             if (!dictExist)
             {
@@ -129,6 +209,50 @@ namespace HASH
             {
                 // идем вправо и ищем свободное место
                 await goRight(newIdx, newNum);
+            }
+            button1.IsEnabled = true;
+        }
+
+        async private void button2_Click(object sender, RoutedEventArgs e)
+        {
+            string delEl = textBox1.Text;
+            int delIdx = Int32.Parse(delEl) % 7;
+
+            // если элемент находится по указанному индексу
+            if (myDict[delIdx].Text == delEl)
+            {
+                movePointer(delIdx);
+
+                // проверим не конец ли массива !!!!!!! тут поставил проверку < 9... Это под конкретный наш пример.!!!!!!!!!!
+                if (delIdx < 9)
+                {
+                    // Удаляем элемент и заменяем его на один из символов
+                    if (myDict[delIdx + 1].Text == "x")
+                    {
+                        outputWindow.Text = "Сразу удаляем!";
+                        myDict[delIdx].Text = "x";
+                    } else
+                    {
+                        outputWindow.Text = "Сразу удаляем и ставим маркер!";
+                        myDict[delIdx].Text = "o";
+                    }
+                }
+                else
+                {
+                    // тут проверка последнего элемента
+                    if (myDict[0].Text == "x")
+                    {
+                        myDict[delIdx].Text = "x";
+                    } else
+                    {
+                        myDict[delIdx].Text = "o";
+                    }
+                }
+            }
+            // ветка когда мы попали при проверке на другое число или на маркер "о"
+            else
+            {
+                await delRight(delEl, delIdx);
             }
         }
     }
