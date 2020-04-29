@@ -42,6 +42,44 @@ namespace HASH
             myPointer[idx].Text = "^";
         }
 
+        void checkClasterFromEnd(int idx)
+        {
+            for (int i = 9; i > idx; i--)
+            {
+                if (myDict[i].Text == "o")
+                {
+                    outputWindow.Text = "Маркеры очищены!";
+                    myDict[i].Text = "x";
+                    continue;
+                }
+                return;
+            }
+        }
+        void checkEndOfClaster(int idx)
+        {
+            // проверяем есть ли слева маркеры, если есть, то их можно удалять
+            if (idx > 0)
+            {
+                for (int i = idx - 1; i > -1; i--)
+                {
+                    if (myDict[i].Text == "o")
+                    {
+                        outputWindow.Text = "Маркеры очищены!";
+                        myDict[i].Text = "x";
+                        continue;
+                    }
+                    return;
+                }
+                // дошли до левого края массива и теперь начинаем обход правой части с конца 
+                checkClasterFromEnd(idx);
+
+            }
+            else
+            {
+                checkClasterFromEnd(idx);
+            }
+        }
+
         async Task goRight(int idx, int num)
         {
             for (int j = idx; j < myDict.Count; j++)
@@ -92,6 +130,7 @@ namespace HASH
                     {
                         myDict[i].Text = "x";
                         outputWindow.Text = "Элемент удален. Конец кластера!";
+                        checkEndOfClaster(i);
                     } else
                     {
                         myDict[i].Text = "o";
@@ -115,6 +154,7 @@ namespace HASH
                 if (myDict[0].Text == "x")
                 {
                     myDict[9].Text = "x";
+                    checkEndOfClaster(9);
                 } else
                 {
                     myDict[9].Text = "o";
@@ -138,6 +178,7 @@ namespace HASH
                     {
                         outputWindow.Text = "Нашел и удалил!";
                         myDict[i].Text = "x";
+                        checkEndOfClaster(i);
                         return;
                     }
                     else
@@ -159,7 +200,7 @@ namespace HASH
         async private void button1_Click(object sender, RoutedEventArgs e)
         {
             // отключим кнопку, чтобы на нее не тыкали часто
-            button1.IsEnabled = false;
+            button1.IsEnabled = button2.IsEnabled = false;
             // Если словарь еще не создан, то создаем его
             if (!dictExist)
             {
@@ -210,13 +251,14 @@ namespace HASH
                 // идем вправо и ищем свободное место
                 await goRight(newIdx, newNum);
             }
-            button1.IsEnabled = true;
+            button1.IsEnabled = button2.IsEnabled = true;
         }
 
         async private void button2_Click(object sender, RoutedEventArgs e)
         {
             string delEl = textBox1.Text;
             int delIdx = Int32.Parse(delEl) % 7;
+            button1.IsEnabled = button2.IsEnabled = false;
 
             // если элемент находится по указанному индексу
             if (myDict[delIdx].Text == delEl)
@@ -231,6 +273,7 @@ namespace HASH
                     {
                         outputWindow.Text = "Сразу удаляем!";
                         myDict[delIdx].Text = "x";
+                        checkEndOfClaster(delIdx);
                     } else
                     {
                         outputWindow.Text = "Сразу удаляем и ставим маркер!";
@@ -243,6 +286,7 @@ namespace HASH
                     if (myDict[0].Text == "x")
                     {
                         myDict[delIdx].Text = "x";
+                        checkEndOfClaster(delIdx);
                     } else
                     {
                         myDict[delIdx].Text = "o";
@@ -254,6 +298,8 @@ namespace HASH
             {
                 await delRight(delEl, delIdx);
             }
+
+            button1.IsEnabled = button2.IsEnabled = true;
         }
     }
 }
